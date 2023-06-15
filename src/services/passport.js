@@ -4,14 +4,14 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import User from "../models/user";
 import dotenv from 'dotenv'
 dotenv.config({silent: true})
-const AUTH_KEY = process.env.AUTH_KEY;
+const AUTH_KEY = 'niyomufashadestin';
 
 
 const localOptions = {usernamefield: 'email'};
 
 const jwtOptions ={
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey : AUTH_KEY // worked ... not wrking in deployment.. idk
+    secretOrKey : AUTH_KEY 
 }
 const LocalLogin = new LocalStrategy(localOptions, async (email, passowrd, done)=>{
     let user;
