@@ -27,7 +27,7 @@ const LocalLogin = new LocalStrategy(localOptions, async (email, passowrd, done)
     }
 })
 
-const jwtAuthentication = new jwtStrategy(jwtOptions, (payload, done)=>{
+const jwtAuthentication = new jwtStrategy(jwtOptions, async (payload, done)=>{
     let user;
     try {
         user = await User.findById(payload.sub);
