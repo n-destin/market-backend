@@ -1,8 +1,11 @@
 import User from "../models/user";
 import jwt from 'jwt-simple';
+import { Timestamp } from "mongodb";
+// import env from '../../.env'
+
 
 export function generateToken(user){
-    return jwt.encode({sub:user.id})                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+    return jwt.encode({sub:user.id, iat: Timestamp})                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 }
 
 export async function singupUser(fields){
@@ -14,5 +17,5 @@ export async function singupUser(fields){
 }
 
 export function singIn(user){
-    return 
+    return jwt.encode({sub: user.id, iat : Timestamp})
 }

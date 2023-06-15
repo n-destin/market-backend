@@ -40,3 +40,4 @@ passport.use(jwtStrategy)
 
 
 export const requireLogin = passport.authenticate('local', {session: false}) 
+export const reqruireAuthentication = passport.authenticate('jwt', {session: false});
