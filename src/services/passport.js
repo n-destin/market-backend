@@ -1,6 +1,6 @@
 import passport from "passport";
 import LocalStrategy from 'passport-local'
-import { Strategy as ExtractJwt, jwtStrategy } from "passport-jwt";
+import { Strategy as ExtractJwt, JwtStrategy } from "passport-jwt";
 import User from "../models/user";
 import dotenv from 'dotenv'
 dotenv.config({silent: true})
@@ -9,7 +9,7 @@ const AUTH_KEY = process.env.AUTH_KEY;
 
 const localOptions = {usernamefield: 'email'};
 const jwtOptions = {
-    jwtFromHeader : ExtractJwt.fromHeader('auth_token'),
+    jwtFromHeader : ExtractJwt.jwtFromHeader('auth_token'),
     secretOrKey : AUTH_KEY
 }
 
@@ -27,7 +27,7 @@ const LocalLogin = new LocalStrategy(localOptions, async (email, passowrd, done)
     }
 })
 
-const jwtAuthentication = new jwtStrategy(jwtOptions, async (payload, done)=>{
+const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
     let user;
     try {
         user = await User.findById(payload.sub);

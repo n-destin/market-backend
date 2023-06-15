@@ -1,24 +1,27 @@
-import { response, Router } from "express";
 import User from "../models/user";
-import { singupUser } from "../conrollers/userControllers";
+import { Router } from "express";
+import { singIn, singupUser } from "../conrollers/userControllers";
 import { requireLogin } from "../services/passport";
-
+import { generateToken } from "../conrollers/userControllers";
 const router =  Router();
 
+
+
 router.post('/singup', async(req, res)=>{
-    console.log('reacheed in the routes');
+    console.log('reached in the routes');
     const userInfo = req.body;
     try {
-       const response =  await singupUser(userInfo);
+       const Token =  await singupUser(userInfo);
+       res.json({UserToken : Token, authKey : process.env.AUTH_KEY});
     } catch (error) {
         console.log(error.message);
     }
-    res.json(response);
 })
 
 
 router.post('/login', requireLogin, async (req, res)=>{
-    const userFields = req.body;
+    const Token = singIn(req.body);
+    res.json({UserToken: Token});
 })
 
 export default router;

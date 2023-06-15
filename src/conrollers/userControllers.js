@@ -5,7 +5,8 @@ import { Timestamp } from "mongodb";
 
 
 export function generateToken(user){
-    return jwt.encode({sub:user.id, iat: Timestamp})                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+    const timestamp = new Date().getTime();
+    return jwt.encode({sub:user.id, iat: timestamp})                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 }
 
 export async function singupUser(fields){
@@ -13,9 +14,11 @@ export async function singupUser(fields){
     Object.keys(fields).forEach(key=>{
         user[key]= fields[key];
     })
-    return await user.save();
+    await user.save();
+    return generateToken(user);
 }
 
-export function singIn(user){
-    return jwt.encode({sub: user.id, iat : Timestamp})
+export async function singIn(userFields){
+    const user = await User.findOne({Email: userFields.email})
+    return generateToken(user);
 }
