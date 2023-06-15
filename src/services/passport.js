@@ -9,13 +9,13 @@ const AUTH_KEY = process.env.AUTH_KEY;
 
 const localOptions = {usernamefield: 'email'};
 const jwtOptions = {
-    jwtFromHeader : ExtractJwt.jwtFromHeader('auth_token'),
+    jwtFromHeader : ExtractJwt.fromHeader('auth_token'),
     secretOrKey : AUTH_KEY
 }
 
 const LocalLogin = new LocalStrategy(localOptions, async (email, passowrd, done)=>{
     let user;
-    let passowrdMathes ;
+    let passowrdMathes;
     try {
         user = await User.findOne({Email: email});
         if(!user) return done(null, false)
