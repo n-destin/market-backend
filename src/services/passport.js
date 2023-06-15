@@ -9,7 +9,7 @@ const AUTH_KEY = process.env.AUTH_KEY;
 
 const localOptions = {usernamefield: 'email'};
 const jwtOptions = {
-    jwtFromHeader : ExtractJwt.FromHeader('auth_token'),
+    jwtFromHeader : ExtractJwt.fromHeader('auth_token'),
     secretOrKey : AUTH_KEY
 }
 
