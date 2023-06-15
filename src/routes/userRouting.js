@@ -20,3 +20,5 @@ router.post('/singup', async(req, res)=>{
 router.post('/login', requireLogin, async (req, res)=>{
     const userFields = req.body;
 })
+
+export default router;

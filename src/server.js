@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import router from './routes/userRouting';
 
 // initialize
 const app = express();
@@ -30,8 +31,10 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 // default index route
 app.get('/', (req, res) => {
-  res.send('hi');
+  res.send('If you recieved this message, it means that I hacked your computer');
 });
+
+app.use('/', router);
 
 // START THE SERVER
 // =============================================================================
