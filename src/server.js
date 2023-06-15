@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
   res.send('If you recieved this message, it means that I hacked your computer');
 });
 
-app.use('/', router);
+app.use('/api', router);
 
 // START THE SERVER
 // =============================================================================

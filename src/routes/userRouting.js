@@ -6,7 +6,9 @@ import { generateToken } from "../conrollers/userControllers";
 const router =  Router();
 
 
-
+router.get('/', async (req, res)=>{
+    res.json("If you are reading this message, it means that I hacked your computer")
+})
 router.post('/singup', async(req, res)=>{
     console.log('reached in the routes');
     const userInfo = req.body;
