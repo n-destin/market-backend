@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 
 // initialize
 const app = express();
@@ -38,7 +39,9 @@ async function startServer() {
   try {
     const port = process.env.PORT || 9090;
     app.listen(port);
-
+    const MONGO_URI =  process.env.MONGO_URI;
+    mongoose.connect(MONGO_URI);
+    console.log('connected to mongodb');
     console.log(`Listening on port ${port}`);
   } catch (error) {
     console.error(error);
