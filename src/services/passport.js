@@ -4,22 +4,22 @@ import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import User from "../models/user";
 import dotenv from 'dotenv'
 dotenv.config({silent: true})
-const AUTH_KEY = 'niyomufashadestin';
 
 
-const localOptions = {usernamefield: 'email'};
+const localOptions = {usernameField: 'Email'};
 
 const jwtOptions ={
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey : AUTH_KEY 
+    secretOrKey : process.env.AUTH_KEY 
 }
-const LocalLogin = new LocalStrategy(localOptions, async (email, passowrd, done)=>{
+const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)=>{
+    console.log('reached in local strategy');
     let user;
     let passowrdMathes;
     try {
-        user = await User.findOne({Email: email});
+        user = await User.findOne({Email});
         if(!user) return done(null, false)
-        passowrdMathes = await User.comparePasswords(passowrd);
+        passowrdMathes = await user.comparePasswords(Password);
         if(!passowrdMathes) return done(null, false)
         return done(null, true);
     } catch (error) {
@@ -44,4 +44,4 @@ passport.use(jwtAuthentication)
 
 
 export const requireLogin = passport.authenticate('local', {session: false}) 
-export const reqruireAuthentication = passport.authenticate('jwt', {session: false});
+export const requireAuthentication = passport.authenticate('jwt', {session: false});

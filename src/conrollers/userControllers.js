@@ -1,12 +1,15 @@
 import User from "../models/user";
 import jwt from 'jwt-simple';
-import { Timestamp } from "mongodb";
+import dotenv from 'dotenv'
+
+//loads if .env is needed
+dotenv.config({silent : true})
 // import env from '../../.env'
 
 
 export function generateToken(user){
     const timestamp = new Date().getTime();
-    return jwt.encode({sub:user.id, iat: timestamp})                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+    return jwt.encode({sub:user.id, iat: timestamp}, process.dotenv.AUTH_KEY)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 }
 
 export async function singupUser(fields){
@@ -19,6 +22,6 @@ export async function singupUser(fields){
 }
 
 export async function singIn(userFields){
-    const user = await User.findOne({Email: userFields.email})
+    const user = await User.findOne({Email: userFields.Email})
     return generateToken(user);
 }

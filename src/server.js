@@ -4,9 +4,11 @@ import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import router from './routes/userRouting';
+const MONGO_URI = 'mongodb+srv://destinNiyomufasha:WuCSMHLHOPzJ9zzh@cluster0.tnqmhdn.mongodb.net/?retryWrites=true&w=majority'
 
 // initialize
 const app = express();
+
 
 // enable/disable cross origin resource sharing if necessary
 app.use(cors());
@@ -30,11 +32,11 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 // additional init stuff should go before hitting the routing
 
 // default index route
-app.get('/', (req, res) => {
-  res.send('If you recieved this message, it means that I hacked your computer');
-});
+// app.get('/', (req, res) => {
+//   res.send('If you recieved this message, it means that I hacked your computer');
+// });
 
-app.use('/api', router);
+app.use('/', router);
 
 // START THE SERVER
 // =============================================================================
@@ -42,7 +44,7 @@ async function startServer() {
   try {
     const port = process.env.PORT || 9090;
     app.listen(port);
-    const MONGO_URI =  process.env.MONGO_URI;
+    // const MONGO_URI =  process.env.MONGO_URI;
     mongoose.connect(MONGO_URI);
     console.log('connected to mongodb');
     console.log(`Listening on port ${port}`);

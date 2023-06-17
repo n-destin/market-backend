@@ -9,9 +9,11 @@ const router =  Router();
 router.get('/', async (req, res)=>{
     res.json("If you are reading this message, it means that I hacked your computer")
 })
-router.post('/singup', async(req, res)=>{
+router.post('/signup', async (req, res)=>{
     console.log('reached in the routes');
     const userInfo = req.body;
+    const Fields = userInfo.userInfo;
+    console.log(Fields);
     try {
        const Token =  await singupUser(userInfo);
        res.json({UserToken : Token, authKey : process.env.AUTH_KEY});
@@ -21,9 +23,14 @@ router.post('/singup', async(req, res)=>{
 })
 
 
-router.post('/login', requireLogin, async (req, res)=>{
+router.post('/signin', async (req, res)=>{
+    console.log('reached in the login');
     const Token = singIn(req.body);
     res.json({UserToken: Token});
+})
+
+router.post('/posting', async (req, res)=>{
+    res.json({message : 'this is a response'})
 })
 
 export default router;

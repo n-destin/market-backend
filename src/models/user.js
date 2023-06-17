@@ -15,20 +15,20 @@ const userSchema = new Schema({
 })
 
 userSchema.pre('save', async function beforeSaving(next){
-    const User = this;
-    if(!User.isModified('Password')) return next;
+    const user = this;
+    if(!user.isModified('Password')) return next;
     try {
         const salt = bcrypt.genSalt(10);
-        const hashedPassword = bcrypt.hash(User.Password, salt);
-        User.Password = hashedPassword;
+        const hashedPassword = bcrypt.hash(user.Password, salt);
+        user.Password = hashedPassword;
     } catch (error) {
         console.log(error.message);
     }
 })
 
 userSchema.methods.comparePasswords = async function comparePasswords(password){
-    const User = this;
-    return bcrypt.compare(User.Password, password);
+    const user = this;
+    return bcrypt.compare(user.Password, password);
 }
 
 const User = mongoose.model('User', userSchema);
