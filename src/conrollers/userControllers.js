@@ -8,6 +8,7 @@ dotenv.config({silent : true})
 
 
 export function generateToken(user){
+    console.log('generating token here');
     const timestamp = new Date().getTime();
     return jwt.encode({sub:user.id, iat: timestamp}, process.env.AUTH_KEY)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 }
@@ -15,6 +16,7 @@ export function generateToken(user){
 export async function singupUser(fields){
     const user = new User;
     Object.keys(fields).forEach(key=>{
+        console.log(key);
         user[key]= fields[key];
     })
     await user.save();
