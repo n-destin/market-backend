@@ -5,9 +5,11 @@ import User from "../models/user";
 import dotenv from 'dotenv'
 dotenv.config({silent: true})
 
-const AUTH_KEY = process.env.AUTH_KEY
+// const AUTH_KEY = process.env.AUTH_KEY
 
 const localOptions = {usernameField: 'Email'};
+
+const AUTH_KEY = 'niyomufashadestintuyizerehonore'
 
 
 const jwtOptions ={
