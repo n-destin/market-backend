@@ -5,12 +5,14 @@ import User from "../models/user";
 import dotenv from 'dotenv'
 dotenv.config({silent: true})
 
+const AUTH_KEY = process.env.AUTH_KEY
 
 const localOptions = {usernameField: 'Email'};
 
+
 const jwtOptions ={
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey : process.env.AUTH_KEY 
+    secretOrKey : AUTH_KEY 
 }
 const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)=>{
     console.log('reached in local strategy');
@@ -35,6 +37,7 @@ const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
         return done(null, true)
     } catch (error) {
         console.log(error.message);
+        return done(null, error);
     }
 })
 

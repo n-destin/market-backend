@@ -4,6 +4,10 @@ import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import router from './routes/userRouting';
+import http from 'http'
+import socketio from 'socket.io'
+
+
 
 
 // initialize
@@ -12,7 +16,8 @@ const app = express();
 
 // enable/disable cross origin resource sharing if necessary
 app.use(cors());
-
+//creating the http server
+const server =  http.createServer(app);
 // enable/disable http request logging
 app.use(morgan('dev'));
 
@@ -36,6 +41,15 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 //   res.send('If you recieved this message, it means that I hacked your computer');
 // });
 
+export const io = socketio(server, {
+  cors:{
+    origin : "*",
+    methods : ['PUT', 'POST', 'GET', "DELETE"]
+  }
+})
+
+
+
 app.use('/', router);
 
 // START THE SERVER
@@ -45,7 +59,9 @@ async function startServer() {
     const port = process.env.PORT || 9090;
     console.log(process.env.PORT);
     app.listen(port);
-    const MONGO_URI =  process.env.MONGO_URI;
+    mongoose.Promise = global.Promise;
+    // const MONGO_URI = process.env.MONGO_URI;
+    const MONGO_URI = 'mongodb+srv://destinNiyomufasha:WuCSMHLHOPzJ9zzh@cluster0.tnqmhdn.mongodb.net/?retryWrites=true&w=majority'
     console.log(MONGO_URI);
     mongoose.connect(MONGO_URI);
     console.log('connected to mongodb');
