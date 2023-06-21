@@ -22,7 +22,7 @@ userSchema.pre('save', async function beforeSaving(next){
         const hashedPassword = bcrypt.hash(user.Password, salt);
         user.Password = hashedPassword;
     } catch (error) {
-        console.log(error.message);
+        console.log(`message : ${error.message}`);
     }
 })
 
