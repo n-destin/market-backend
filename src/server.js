@@ -4,7 +4,7 @@ import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import router from './routes/userRouting';
-const MONGO_URI = 'mongodb+srv://destinNiyomufasha:WuCSMHLHOPzJ9zzh@cluster0.tnqmhdn.mongodb.net/?retryWrites=true&w=majority'
+
 
 // initialize
 const app = express();
@@ -43,8 +43,10 @@ app.use('/', router);
 async function startServer() {
   try {
     const port = process.env.PORT || 9090;
+    console.log(process.env.PORT);
     app.listen(port);
-    // const MONGO_URI =  process.env.MONGO_URI;
+    const MONGO_URI =  process.env.MONGO_URI;
+    console.log(MONGO_URI);
     mongoose.connect(MONGO_URI);
     console.log('connected to mongodb');
     console.log(`Listening on port ${port}`);
