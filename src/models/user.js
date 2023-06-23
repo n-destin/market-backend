@@ -18,11 +18,11 @@ userSchema.pre('save', async function beforeSaving(next){
     const user = this;
     if(!user.isModified('Password')) return next;
     try {
-        const salt = bcrypt.genSalt(10);
-        const hashedPassword = bcrypt.hash(user.Password, salt);
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(user.Password, salt);
         user.Password = hashedPassword;
     } catch (error) {
-        console.log(`message : ${error.message}`);
+        console.log(error.message);
     }
 })
 
@@ -32,4 +32,5 @@ userSchema.methods.comparePasswords = async function comparePasswords(password){
 }
 
 const User = mongoose.model('User', userSchema);
+
 export default User;

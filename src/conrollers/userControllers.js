@@ -15,15 +15,17 @@ export function generateToken(user){
 
 export async function singupUser(fields){
     const user = new User;
+    // console.log(fields.userInfo);
     Object.keys(fields).forEach(key=>{
         console.log(key);
         user[key]= fields[key];
     })
+    console.log(user);
     await user.save();
     return generateToken(user);
 }
 
-export async function singIn(userFields){
+export async function signIn(userFields){
     const user = await User.findOne({Email: userFields.Email})
     return generateToken(user);
 }

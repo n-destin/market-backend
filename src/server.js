@@ -6,9 +6,8 @@ import mongoose from 'mongoose';
 import router from './routes/userRouting';
 import http from 'http'
 import socketio from 'socket.io'
-
-
-
+import dotenv from 'dotenv'
+dotenv.config({silent : true})
 
 // initialize
 const app = express();
