@@ -4,6 +4,7 @@ import { signIn, singupUser } from "../conrollers/userControllers";
 import {requireAuthentication, requireLogin} from '../services/passport'
 import  Product  from "../models/product";
 import dotenv from 'dotenv'
+import * as productFunction from '../conrollers/proudctControllers'
 dotenv.config({silent : true})
 const router =  Router();
 
@@ -42,9 +43,12 @@ router.get('/products', async ( req, res)=>{
 
 router.get('/getProduct/:id', async (req, res)=>{
     const id = req.params.id
-    let product = await Product.findById(id);
-    if(!product) throw new Error('there is no such product');
-    res.json({product: product})
+    try {
+        const product = await Product.findById(id)
+        res.json(product)
+    } catch (error) {
+        console.log(error.message);
+    }
 })
 
 
