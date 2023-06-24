@@ -5,6 +5,8 @@ import {requireAuthentication, requireLogin} from '../services/passport'
 import  Product  from "../models/product";
 import dotenv from 'dotenv'
 import * as productFunction from '../conrollers/proudctControllers'
+import { Cart } from "../models/cart";
+import produce from 'immer'
 dotenv.config({silent : true})
 const router =  Router();
 
@@ -66,6 +68,13 @@ router.post('/createProduct', async (req, res)=>{
     await newProduct.save();
     res.json({message: 'Product created'})
 
+})
+
+router.post('/addtocart', async (req, res)=>{
+    const userId = req.params.id;
+    const cart = Cart.findOne({Owner: userId})
+    if(!cart) throw new Error('there is such cart')
+    await cart.Products.unshift()
 })
 
 export default router;
