@@ -7,12 +7,13 @@ import router from './routes/userRouting';
 import http from 'http'
 import socketio from 'socket.io'
 import dotenv from 'dotenv'
+import passport from "passport";
 dotenv.config({silent : true})
 
 // initialize
 const app = express();
 
-
+app.use(passport.initialize());
 // enable/disable cross origin resource sharing if necessary
 app.use(cors());
 //creating the http server
@@ -32,6 +33,7 @@ app.set('views', path.join(__dirname, '../src/views'));
 // enable json message body for posting data to API
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // To parse the incoming requests with JSON payloads
+
 
 // additional init stuff should go before hitting the routing
 

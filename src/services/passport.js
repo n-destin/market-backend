@@ -7,7 +7,7 @@ dotenv.config({silent: true})
 
 // const AUTH_KEY = process.env.AUTH_KEY
 
-const localOptions = {usernameField: 'Email'};
+const localOptions = {usernameField: 'Email', passwordField: 'Password'};
 
 const AUTH_KEY = 'niyomufashadestintuyizerehonore'
 

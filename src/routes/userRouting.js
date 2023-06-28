@@ -7,6 +7,7 @@ import dotenv from 'dotenv'
 import * as productFunction from '../conrollers/proudctControllers'
 import { Cart } from "../models/cart";
 import produce from 'immer'
+import {middlewareexample} from '../services/amazon'
 dotenv.config({silent : true})
 const router =  Router();
 
