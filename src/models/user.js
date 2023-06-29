@@ -1,13 +1,18 @@
 import mongoose, {Schema} from "mongoose";
 import bcrypt from  'bcryptjs'
 
+const userStatus = {
+    BUYER : 'BUYER',
+    SELLER : 'SELLER'
+}
+
 const userSchema = new Schema({
     firstName: String,
     lastName: String,
     Password: String,
     Email: String,
     phoneNumber: Number,
-    Class: Number
+    Favorites : [Schema.Types.ObjectId]
 },
 {
     toJSON : {virtuals : true},

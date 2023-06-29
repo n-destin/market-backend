@@ -10,18 +10,28 @@ const categories = {
     COMMUNITY : 'COMMUNITY'
 }
 
+const productState = {
+    SOLD : 'SOLD',
+    RECIEVED : 'RECIEVED',
+    BOOKED : 'BOOKED',
+    UNSOLD : 'UNSOLD'
+}
+
 const product = new Schema({
-    Owner: mongoose.Types.ObjectId, 
+    Seller: mongoose.Types.ObjectId, 
     Image: [String],
-    Name: String,
-    Price: Schema.Types.Decimal128,
-    Description: String,
-    Category : {type: String, enum: categories},
-    Donation : {type: Boolean, default: false},
-    Status: String
+    productName: String,
+    productPrice: Schema.Types.Decimal128,
+    productDescription: String,
+    productCategory : {type: String, enum: categories},
+    donationStatus : {type: Boolean, default: false},
+    productStatus: String,
+    productOffers : [{amount :String, Person : Schema.Types.ObjectId}],
+    productState : {type: String, enum: productState, default : productState.UNSOLD}
 }, {
     toJSON : {virtuals: true},
-    toObject : {vituals : true}
+    toObject : {vituals : true},
+    timestamps : true,
 })
 
  const Product = mongoose.model('Product', product)
