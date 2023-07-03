@@ -9,6 +9,7 @@ import socketio from 'socket.io'
 import dotenv from 'dotenv'
 import passport from "passport";
 dotenv.config({silent : true})
+import { getRecommendations } from './some Algortithms/recommendation';
 
 // initialize
 const app = express();
@@ -42,6 +43,8 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 //   res.send('If you recieved this message, it means that I hacked your computer');
 // });
 
+getRecommendations(['Destin Niyomufasha', 'pacifique mucyo', 'Honore Tuyizere', 'Marie Chance uwineza'], null)
+
 export const io = socketio(server, {
   cors:{
     origin : "*",
@@ -59,7 +62,7 @@ async function startServer() {
   try {
     const port = process.env.PORT || 9090;
     console.log(process.env.PORT);
-    app.listen(port);
+    server.listen(port);
     mongoose.Promise = global.Promise;
     // const MONGO_URI = process.env.MONGO_URI;
     const MONGO_URI = 'mongodb+srv://destinNiyomufasha:WuCSMHLHOPzJ9zzh@cluster0.tnqmhdn.mongodb.net/?retryWrites=true&w=majority'

@@ -12,6 +12,7 @@ const userSchema = new Schema({
     Password: String,
     Email: String,
     phoneNumber: Number,
+    searchHistory : [String],
     Favorites : [Schema.Types.ObjectId]
 },
 {
