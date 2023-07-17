@@ -9,7 +9,7 @@ import socketio from 'socket.io'
 import dotenv from 'dotenv'
 import passport from "passport";
 dotenv.config({silent : true})
-import { getRecommendations } from './some Algortithms/recommendation';
+// import { getRecommendations } from './some Algortithms/recommendation';
 
 // initialize
 const app = express();
@@ -43,7 +43,6 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 //   res.send('If you recieved this message, it means that I hacked your computer');
 // });
 
-getRecommendations(['Destin Niyomufasha', 'pacifique mucyo', 'Honore Tuyizere', 'Marie Chance uwineza'], null)
 
 export const io = socketio(server, {
   cors:{

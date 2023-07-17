@@ -3,6 +3,7 @@ import LocalStrategy from 'passport-local'
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import User from "../models/user";
 import dotenv from 'dotenv'
+import GoogleStrategy from 'passport-google-oauth2'
 dotenv.config({silent: true})
 
 // const AUTH_KEY = process.env.AUTH_KEY
@@ -46,6 +47,9 @@ const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
 
 passport.use(LocalLogin);
 passport.use(jwtAuthentication)
+// passport.use(new GoogleStrategy(
+    
+// ))
 
 
 export const requireLogin = passport.authenticate('local', {session: false}) 

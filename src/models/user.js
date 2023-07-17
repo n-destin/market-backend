@@ -9,11 +9,14 @@ const userStatus = {
 const userSchema = new Schema({
     firstName: String,
     lastName: String,
-    Password: String,
+    Password: String, 
     Email: String,
     phoneNumber: Number,
     searchHistory : [String],
-    Favorites : [Schema.Types.ObjectId]
+    Favorites : [Schema.Types.ObjectId],
+    Transacations : [Schema.Types.ObjectId],
+    DateJoined : Schema.Types.ObjectId,
+
 },
 {
     toJSON : {virtuals : true},

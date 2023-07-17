@@ -23,7 +23,7 @@ const product = new Schema({
     productName: String,
     productPrice: Schema.Types.Decimal128,
     productDescription: String,
-    productCategory : {type: String, enum: categories},
+    productCategory : {type: String, enum: categories}, // we need to keep both the cateogry and if it is a donation or not
     donationStatus : {type: Boolean, default: false},
     productStatus: String,
     productOffers : [{amount :String, Person : Schema.Types.ObjectId}],

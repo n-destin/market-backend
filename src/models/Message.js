@@ -1,10 +1,10 @@
 import mongoose, {Schema} from "mongoose";
 
 const messageSchema = new Schema({
-    Sender : String,
+    Reciever : mongoose.Types.ObjectId,
     Owner : mongoose.Types.ObjectId,
-    Image : String,
-    Text: String
+    Text: String, 
+    timeSent : Date
 })
 
 
