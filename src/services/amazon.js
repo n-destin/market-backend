@@ -13,7 +13,7 @@ const getS3Url = (req, res)=>{
         Expires : 60,
         ACL : 'public-read'
     }
-
+    
     const S3 = new aws.S3();
     S3.getSignedUrl('putObject', requestParams, (error, data)=>{
         if(error) throw new Error('error uploading a file');

@@ -8,6 +8,7 @@ import * as productFunction from '../conrollers/proudctControllers'
 import { Cart } from "../models/cart";
 import produce from 'immer'
 import {middlewareexample} from '../services/amazon'
+import {Search} from '../services/search'
 dotenv.config({silent : true})
 const router =  Router();
 
@@ -78,4 +79,10 @@ router.post('/addtocart', async (req, res)=>{
     await cart.Products.unshift()
 })
 
-export default router;
+router.get(`/search`, async (req, res)=>{
+    const searchTerm = req.searcnh_term;
+    const matchedProrducts = Search(searchTerm);
+    res.json({matchedProrducts}) // send them to the client
+})
+
+export default router; 
