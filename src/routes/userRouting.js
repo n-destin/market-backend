@@ -2,27 +2,28 @@ import User from "../models/user";
 import { Router } from "express";
 import { signIn, singupUser } from "../conrollers/userControllers";
 import {requireAuthentication, requireLogin} from '../services/passport'
+import getS3Url from '../services/amazon'
 import  Product  from "../models/product";
 import dotenv from 'dotenv'
 import * as productFunction from '../conrollers/proudctControllers'
 import { Cart } from "../models/cart";
 import produce from 'immer'
 import {middlewareexample} from '../services/amazon'
-import {Search} from '../services/search'
+import Search from '../conrollers/proudctControllers'
 dotenv.config({silent : true})
 const router =  Router();
-
 
 router.get('/', async (req, res)=>{
     res.json("If you are reading this message, it means that I hacked your computer")
 })
 router.post('/signup', async (req, res)=>{
-    console.log('reached in the routes');
     const userInfo = req.body;
     const Fields = userInfo.userInfo;
     try {
        const Token =  await singupUser(Fields);
-       res.json({UserToken : Token, authKey : process.env.AUTH_KEY});
+       const userInfoForFrontEnd = {firstName : Fields.firstName, lastName : Fields.lastName, userEmail: Fields.Email, phoneNumber : Fields.phoneNumber}
+       console.log(Token);
+       res.json({UserToken : Token, authKey : process.env.AUTH_KEY, userInfo : userInfoForFrontEnd});
     } catch (error) {
         console.log(error.message);
     }
@@ -37,6 +38,8 @@ router.post('/signin', requireLogin, async (req, res)=>{
 router.post('/posting', async (req, res)=>{
     res.json({message : 'this is a response'})
 })
+
+router.post('/addtocart',)
 
 router.get('/products', async ( req, res)=>{
     console.log('reached in the products routes');
@@ -85,4 +88,12 @@ router.get(`/search`, async (req, res)=>{
     res.json({matchedProrducts}) // send them to the client
 })
 
+router.get('/category', async(req, res)=>{
+    const categoryName = req.category_name;
+    const products = await Product.find({productCategory : categoryName});
+    res.send({products})
+})
+
+
+router.get('/sign-s3', getS3Url)
 export default router; 

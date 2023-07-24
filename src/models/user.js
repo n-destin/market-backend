@@ -16,7 +16,8 @@ const userSchema = new Schema({
     Favorites : [Schema.Types.ObjectId],
     Transacations : [Schema.Types.ObjectId],
     DateJoined : Schema.Types.ObjectId,
-
+    cartProducts : [Schema.Types.ObjectId],
+    userConversations : [Schema.Types.ObjectId]
 },
 {
     toJSON : {virtuals : true},

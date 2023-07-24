@@ -10,11 +10,25 @@ const categories = {
     COMMUNITY : 'COMMUNITY'
 }
 
+const purposes  = {
+    SELL : "SELL",
+    RENT : "RENT",
+    DONATE : "DONATE"
+}
+
 const productState = {
     SOLD : 'SOLD',
     RECIEVED : 'RECIEVED',
     BOOKED : 'BOOKED',
     UNSOLD : 'UNSOLD'
+}
+
+const conditions = {
+    NEW : 'NEW',
+    LIKE_NEW : 'LIKE_NEW',
+    GOOD : 'GOOD',
+    FAIR : 'FAIR',
+    POOR : 'POOR'
 }
 
 const product = new Schema({
@@ -24,10 +38,11 @@ const product = new Schema({
     productPrice: Schema.Types.Decimal128,
     productDescription: String,
     productCategory : {type: String, enum: categories}, // we need to keep both the cateogry and if it is a donation or not
-    donationStatus : {type: Boolean, default: false},
+    Purpose : {type: String, default : purposes.SELL, enum : purposes},
     productStatus: String,
-    productOffers : [{amount :String, Person : Schema.Types.ObjectId}],
-    productState : {type: String, enum: productState, default : productState.UNSOLD}
+    productOffers : [{amount :Schema.Types.Decimal128, Person : Schema.Types.ObjectId}], // people who offered money for the product
+    productState : {type: String, enum: productState, default : productState.UNSOLD},
+    productCondition : {type: String, required: true, enum : conditions},
 }, {
     toJSON : {virtuals: true},
     toObject : {vituals : true},

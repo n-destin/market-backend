@@ -8,8 +8,7 @@ import http from 'http'
 import socketio from 'socket.io'
 import dotenv from 'dotenv'
 import passport from "passport";
-dotenv.config({silent : true})
-// import { getRecommendations } from './some Algortithms/recommendation';
+import {getConversations} from './services/chat'
 
 // initialize
 const app = express();
@@ -38,20 +37,34 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 // additional init stuff should go before hitting the routing
 
-// default index route
-// app.get('/', (req, res) => {
-//   res.send('If you recieved this message, it means that I hacked your computer');
-// });
-
-
 export const io = socketio(server, {
   cors:{
-    origin : "*",
+    origin : "*", // change to the your the url of the platform
     methods : ['PUT', 'POST', 'GET', "DELETE"]
   }
 })
 
+io.on('connection', (socket)=>{
+  socket.on('get_conversations', (userId, callback)=>{
+    const returnedConversations = getConversations(userId);
+    callback(returnedConversations);
+  })
 
+  socket.on('join_room', roomId=>{
+    socket.join(roomId); // join the room
+  })
+
+  socket.on('new_message', (newMessage, currentRoom)=>{
+    socket.to(currentRoom).emit('recieve_message', newMessage);
+    const conversation = Conversation.findById(currentRoom);
+    conversation.messages = [...conversation.messages, newMessage]; // add the message to the messages of the conversation of the user
+  })
+
+  socket.on('get_messages', (conversationId, callBack)=>{
+    const messages = Conversation.findById(conversationId); // getting the messages
+    callBack(messages);
+  })
+})
 
 app.use('/', router);
 
@@ -73,5 +86,6 @@ async function startServer() {
     console.error(error);
   }
 }
+
 
 startServer();

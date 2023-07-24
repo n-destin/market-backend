@@ -9,7 +9,6 @@ dotenv.config({silent: true})
 // const AUTH_KEY = process.env.AUTH_KEY
 
 const localOptions = {usernameField: 'Email', passwordField: 'Password'};
-
 const AUTH_KEY = 'niyomufashadestintuyizerehonore'
 
 
@@ -17,6 +16,7 @@ const jwtOptions ={
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
     secretOrKey : AUTH_KEY 
 }
+
 const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)=>{
     console.log('reached in local strategy');
     let user;
