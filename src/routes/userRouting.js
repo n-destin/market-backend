@@ -10,8 +10,14 @@ import { Cart } from "../models/cart";
 import produce from 'immer'
 import {middlewareexample} from '../services/amazon'
 import Search from '../conrollers/proudctControllers'
+import {stripeFunction} from '../services/payment'
+import Stripe from "stripe";
+
+
 dotenv.config({silent : true})
 const router =  Router();
+
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 router.get('/', async (req, res)=>{
     res.json("If you are reading this message, it means that I hacked your computer")
@@ -58,18 +64,18 @@ router.get('/getProduct/:id', async (req, res)=>{
     }
 })
 
-
+ // wrap everything into try and catch //
 router.post('/createProduct', async (req, res)=>{
     console.log('reached in the backend creating');
     const newProduct = new Product;
     const id = req.body.id;
     newProduct.Owner = id;
     const Fields = req.body;
-    console.log(Fields);
+    const pricingInfo = await productFunction.createProductAndPrice(Fields.productName, Fields.productPrice, 'usd')
+    newProduct[productPricingInfo] = pricingInfo;
     Object.keys(Fields).forEach(key=>{
         newProduct[key] = Fields[key]
     })
-
     await newProduct.save();
     res.json({message: 'Product created'})
 
@@ -94,6 +100,7 @@ router.get('/category', async(req, res)=>{
     res.send({products})
 })
 
+router.post('/create-payment-session', stripeFunction);
 
 router.get('/sign-s3', getS3Url)
 export default router; 

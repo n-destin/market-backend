@@ -2,6 +2,9 @@ import Product from "../models/product";
 // import Product from "../models/product";
 import User from "../models/user";
 import { produce } from "immer";
+import Stripe from "stripe";
+
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function getProduct(id){
     const product =  await Product.findById(id);
@@ -42,3 +45,22 @@ export async function Search(searchTerm){
     return matchProducts
 }
 //removing from cart 
+
+
+export async function createProductAndPrice(name, price, currency){
+    try {
+         stripe.products.create(name).then(response=>{
+            if(response){
+                stripe.prices.create({
+                    product : response.data.id,
+                    unit_amounts : price,
+                    currency,
+                }).then(response=>{
+                    if(response) return {productId : response.data.product, priceId : response.data.id};
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error.message);
+    }
+}
