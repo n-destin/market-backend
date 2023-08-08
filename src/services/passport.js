@@ -34,15 +34,20 @@ const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)
 
 const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
     let user;
+    console.log(payload);
     try {
         user = await User.findById(payload.sub);
+        console.log(user);
         if(!user) return done(null, false);
-        return done(null, true)
+        return done(null, user)
     } catch (error) {
         console.log(error.message);
         return done(null, error);
     }
 })
+
+
+
 
 
 passport.use(LocalLogin);

@@ -12,8 +12,8 @@ export async function getProduct(id){
     return product;
 }
 // function to search for matching producst. can be used for the search functionality, and when one reaches on a news page
-
 // adding to cart
+
 export async function cartFunction(cartAction, userId, ProductId){
     try {
         const Person = await User.findById(userId);
@@ -27,7 +27,6 @@ export async function cartFunction(cartAction, userId, ProductId){
                 }
             }
         }
-
 
     } catch (error) {
         console.log(error.messafe);
@@ -45,8 +44,6 @@ export async function Search(searchTerm){
     return matchProducts
 }
 //removing from cart 
-
-
 export async function createProductAndPrice(name, price, currency){
     try {
          stripe.products.create(name).then(response=>{

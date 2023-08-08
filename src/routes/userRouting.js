@@ -12,20 +12,21 @@ import {middlewareexample} from '../services/amazon'
 import Search from '../conrollers/proudctControllers'
 import {stripeFunction} from '../services/payment'
 import Stripe from "stripe";
+import { BSON } from "mongodb";
 
-
+const ourPercentage = .24;
 dotenv.config({silent : true})
 const router =  Router();
-
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
 router.get('/', async (req, res)=>{
     res.json("If you are reading this message, it means that I hacked your computer")
 })
 router.post('/signup', async (req, res)=>{
     const userInfo = req.body;
+    const userId = new Date.now()
     const Fields = userInfo.userInfo;
     try {
+        const userEmail = Fields.Email;
        const Token =  await singupUser(Fields);
        const userInfoForFrontEnd = {firstName : Fields.firstName, lastName : Fields.lastName, userEmail: Fields.Email, phoneNumber : Fields.phoneNumber}
        console.log(Token);
@@ -45,9 +46,9 @@ router.post('/posting', async (req, res)=>{
     res.json({message : 'this is a response'})
 })
 
-router.post('/addtocart',)
+router.post('/addtocart',requireAuthentication, (req,res)=> { req.user }) // get them here 
 
-router.get('/products', async ( req, res)=>{
+router.get('/products', async (req, res)=>{
     console.log('reached in the products routes');
     const products = await Product.find();
     console.log(products);
@@ -65,14 +66,14 @@ router.get('/getProduct/:id', async (req, res)=>{
 })
 
  // wrap everything into try and catch //
-router.post('/createProduct', async (req, res)=>{
+router.post('/createProduct', requireAuthentication, async (req, res)=>{
     console.log('reached in the backend creating');
     const newProduct = new Product;
-    const id = req.body.id;
+    const id = req.user.id;
     newProduct.Owner = id;
     const Fields = req.body;
     const pricingInfo = await productFunction.createProductAndPrice(Fields.productName, Fields.productPrice, 'usd')
-    newProduct[productPricingInfo] = pricingInfo;
+    newProduct[productPricingInformation] = pricingInfo;
     Object.keys(Fields).forEach(key=>{
         newProduct[key] = Fields[key]
     })
@@ -94,11 +95,35 @@ router.get(`/search`, async (req, res)=>{
     res.json({matchedProrducts}) // send them to the client
 })
 
+const webhookSecret =  'whsec_2070e1acbbb65c3682459b74cb365c4be1b357fc653bf52f2cc793cfb648b4e3'
+
 router.get('/category', async(req, res)=>{
     const categoryName = req.category_name;
     const products = await Product.find({productCategory : categoryName});
     res.send({products})
 })
+
+router.post('/webhook', async(req, res)=>{
+    const event =  req.body.type;
+    switch(event){
+        case 'payment_intent.succeeded':
+            const payment_method_options = req.body.data;
+            break;
+        case 'checkout.session.async_payment_succeeded':
+            const amoutToSend =  req.body.data.amount_recieved * (1-ourPercentage); // here we have got the amount of money to send when succeded .... we can create pending a new Transaction again for the person who sold the product, and then say that it is stil pending, and then when the buyer of hte product confirms that the product is reciecved, then we can set that transaction to active, and then send the monent to the user. 
+            const product =  await Product.findById(req.body.data.productId)
+            break;
+        case 'checkout.session.completed':
+            console.log(req.body.data.invoice_creation); // resume from here tomorrow 8th August
+            const eventData = req.body;
+            console.log(eventData);
+            break;
+    }
+})
+
+// router.get('/checkLogin', requireAuthentication, async (req, res)=>{
+//     console.log(req.user);
+// })
 
 router.post('/create-payment-session', stripeFunction);
 

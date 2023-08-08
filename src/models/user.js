@@ -8,6 +8,7 @@ const userStatus = {
 
 const userSchema = new Schema({
     firstName: String,
+    UserId : String,
     lastName: String,
     Password: String, 
     Email: String,
@@ -17,7 +18,8 @@ const userSchema = new Schema({
     Transacations : [Schema.Types.ObjectId],
     DateJoined : Schema.Types.ObjectId,
     cartProducts : [Schema.Types.ObjectId],
-    userConversations : [Schema.Types.ObjectId]
+    userConversations : [Schema.Types.ObjectId],
+    Verified : {type: Boolean, required: true}
 },
 {
     toJSON : {virtuals : true},

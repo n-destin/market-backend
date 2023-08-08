@@ -8,7 +8,7 @@ const transactionCases = {
 const paymentStatus = {
     PAYMENT_INITIATED : 'PAYMENT_INITIATED',
     PAYMENT_FAILED : 'PAYMENT_FAILED',
-    PAID_PRODUCT_NOT_RECIEVED : 'PAID_NOT_RECIEVED',
+    PAID_PRODUCT_NOT_RECIEVED : 'PAID_BUT_NOT_RECIEVED',
     PAID_AND_RECIEVED : 'PAID_AND_RECIEVED',
 }
 
@@ -23,7 +23,7 @@ const transactionSchema = new Schema(
         Seller : Schema.Types.ObjectId,
         TransactionTime : Date,
         TransactionAmount :  Schema.Types.Decimal128, // don't need to get the transcationn from the product since there might some much more money involved, maybe 
-        paymentStatus : {type: String, enum: paymentStatus.PAID_PRODUCT_NOT_RECIEVED, default : paymentStatus.PAYMENT_INITIATED}
+        paymentStatus : {type: String, enum: paymentStatus, default : paymentStatus.PAYMENT_INITIATED}
     },
     {
         toJSON : {virtuals : true},

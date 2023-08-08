@@ -44,6 +44,10 @@ export const io = socketio(server, {
   }
 })
 
+// app.post('/webhook', express.raw({type: 'application/json'}), async(req, res)=>{
+//   console.log('obtained a webhook');
+// })
+
 io.on('connection', (socket)=>{
   socket.on('get_conversations', (userId, callback)=>{
     const returnedConversations = getConversations(userId);
