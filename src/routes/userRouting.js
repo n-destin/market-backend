@@ -13,6 +13,7 @@ import Search from '../conrollers/proudctControllers'
 import {stripeFunction} from '../services/payment'
 import Stripe from "stripe";
 import { BSON } from "mongodb";
+import {generate} from '../services/gpt'
 
 const ourPercentage = .24;
 dotenv.config({silent : true})
@@ -103,10 +104,14 @@ router.get('/category', async(req, res)=>{
     res.send({products})
 })
 
+router.post('/generate', generate)
+
 router.post('/webhook', async(req, res)=>{
+    console.log('reach out here in webhooks');
     const event =  req.body.type;
     switch(event){
         case 'payment_intent.succeeded':
+            console.log('payment intent became successful here');
             const payment_method_options = req.body.data;
             break;
         case 'checkout.session.async_payment_succeeded':
@@ -114,16 +119,15 @@ router.post('/webhook', async(req, res)=>{
             const product =  await Product.findById(req.body.data.productId)
             break;
         case 'checkout.session.completed':
-            console.log(req.body.data.invoice_creation); // resume from here tomorrow 8th August
-            const eventData = req.body;
-            console.log(eventData);
+            const checkoutId = req.body.data.object.id;
+            const session = await stripe.checkout.sessions.retrieve(checkoutId, {expand : ['customer']});
+            console.log(session);
             break;
+        default:
+            return null;
     }
 })
 
-// router.get('/checkLogin', requireAuthentication, async (req, res)=>{
-//     console.log(req.user);
-// })
 
 router.post('/create-payment-session', stripeFunction);
 

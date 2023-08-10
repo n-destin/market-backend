@@ -23,6 +23,7 @@ export async function stripeFunction(req, res){
         mode : 'payment',
         line_items : priceObjectIdsAndQuantityArray,
     })
+    
     if(session){
         // create a new transaction, productId, the person logged in (not yet available), and  I also need to access the userId from here
         const newTranstion = new Transaction();
