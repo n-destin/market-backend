@@ -10,7 +10,7 @@ const categories = {
     COMMUNITY : 'COMMUNITY'
 }
 
-const purposes  = {
+export const purposes  = {
     SELL : "SELL",
     RENT : "RENT",
     DONATE : "DONATE"
@@ -40,7 +40,7 @@ const product = new Schema({
     productCategory : {type: String, enum: categories}, // we need to keep both the cateogry and if it is a donation or not
     Purpose : {type: String, default : purposes.SELL, enum : purposes},
     productStatus: String,
-    priceID : String,
+    productPricingInformation : {},
     productOffers : [{amount :Schema.Types.Decimal128, Person : Schema.Types.ObjectId}], // people who offered money for the product
     productState : {type: String, enum: productState, default : productState.UNSOLD},
     productCondition : {type: String, required: true, enum : conditions},

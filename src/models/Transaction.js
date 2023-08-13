@@ -1,9 +1,5 @@
 import mongoose, {Schema} from "mongoose";
-
-const transactionCases = {
-    BUY : 'BUY',
-    RENT : 'RENT',
-}
+import { purposes } from "./product";
 
 export const paymentStatus = {
     PAYMENT_INITIATED : 'PAYMENT_INITIATED',
@@ -16,7 +12,7 @@ const transactionSchema = new Schema(
     {
         TransactionType: {
             type: String,
-            enum: transactionCases,
+            enum: purposes,
         },
         Product : Schema.Types.ObjectId,
         Buyer : Schema.Types.ObjectId, // also stands for someone who rent something from the seller who also act as someone who rent our something

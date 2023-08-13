@@ -50,7 +50,7 @@ router.post('/posting', async (req, res)=>{
     res.json({message : 'this is a response'})
 })
 
-router.post('/addtocart',requireAuthentication, (req,res)=> { req.user }) // get them here 
+// router.post('/addtocart',requireAuthentication, (req,res)=> { req.user }) // get them here 
 
 router.get('/products', async (req, res)=>{
     console.log('reached in the products routes');
@@ -87,8 +87,9 @@ router.post('/createProduct', requireAuthentication, async (req, res)=>{
 
 })
 
-router.post('/addtocart', async (req, res)=>{
-    const userId = req.params.id;
+router.post('/addtocart', requireAuthentication, async (req, res)=>{
+    console.log('adding to card');
+    const userId = req.user;
     const cart = Cart.findOne({Owner: userId})
     if(!cart) throw new Error('there is such cart')
     await cart.Products.unshift()

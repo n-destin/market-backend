@@ -12,7 +12,7 @@ const localOptions = {usernameField: 'Email', passwordField: 'Password'};
 const AUTH_KEY = 'niyomufashadestintuyizerehonore'
 
 
-const jwtOptions ={
+const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
     secretOrKey : AUTH_KEY 
 }
@@ -37,8 +37,8 @@ const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)
 })
 
 const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
+    console.log('reached in authorization');
     let user;
-    console.log(payload);
     try {
         user = await User.findById(payload.sub);
         console.log(user);
