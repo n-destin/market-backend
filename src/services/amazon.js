@@ -13,7 +13,7 @@ const getS3Url = (req, res)=>{
         Bucket : BUCKET_NAME,
         Key : file_name,
         ContentType : file_type,
-        Expires : 60,
+        Expires : 3600,
         ACL : 'public-read'
     }
     // configure the AWS

@@ -40,6 +40,7 @@ const product = new Schema({
     productCategory : {type: String, enum: categories}, // we need to keep both the cateogry and if it is a donation or not
     Purpose : {type: String, default : purposes.SELL, enum : purposes},
     productStatus: String,
+    priceID : String,
     productOffers : [{amount :Schema.Types.Decimal128, Person : Schema.Types.ObjectId}], // people who offered money for the product
     productState : {type: String, enum: productState, default : productState.UNSOLD},
     productCondition : {type: String, required: true, enum : conditions},

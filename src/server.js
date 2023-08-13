@@ -13,6 +13,8 @@ import {getConversations} from './services/chat'
 // initialize
 const app = express();
 
+dotenv.config({silent:true});
+
 app.use(passport.initialize());
 // enable/disable cross origin resource sharing if necessary
 app.use(cors());
@@ -58,6 +60,10 @@ io.on('connection', (socket)=>{
     socket.join(roomId); // join the room
   })
 
+  socket.on('detele_message', ()=>{
+    console.log('user attempting to delete a message');
+  })
+
   socket.on('new_message', (newMessage, currentRoom)=>{
     socket.to(currentRoom).emit('recieve_message', newMessage);
     const conversation = Conversation.findById(currentRoom);
@@ -80,10 +86,7 @@ async function startServer() {
     console.log(process.env.PORT);
     server.listen(port);
     mongoose.Promise = global.Promise;
-    // const MONGO_URI = process.env.MONGO_URI;
-    const MONGO_URI = 'mongodb+srv://destinNiyomufasha:WuCSMHLHOPzJ9zzh@cluster0.tnqmhdn.mongodb.net/?retryWrites=true&w=majority'
-    console.log(MONGO_URI);
-    mongoose.connect(MONGO_URI);
+    mongoose.connect(process.env.MONGO_URI);
     console.log('connected to mongodb');
     console.log(`Listening on port ${port}`);
   } catch (error) {

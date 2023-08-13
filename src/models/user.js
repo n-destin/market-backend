@@ -12,14 +12,14 @@ const userSchema = new Schema({
     lastName: String,
     Password: String, 
     Email: String,
+    stripeaccountid : String,
     phoneNumber: Number,
     searchHistory : [String],
     Favorites : [Schema.Types.ObjectId],
-    Transacations : [Schema.Types.ObjectId],
     DateJoined : Schema.Types.ObjectId,
     cartProducts : [Schema.Types.ObjectId],
     userConversations : [Schema.Types.ObjectId],
-    Verified : {type: Boolean, required: true}
+    Verified : {type: Boolean, required: true, default : false}
 },
 {
     toJSON : {virtuals : true},
@@ -40,7 +40,7 @@ userSchema.pre('save', async function beforeSaving(next){
 
 userSchema.methods.comparePasswords = async function comparePasswords(password){
     const user = this;
-    return bcrypt.compare(user.Password, password);
+    return bcrypt.compare(password, user.Password);
 }
 
 const User = mongoose.model('User', userSchema);

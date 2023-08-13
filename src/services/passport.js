@@ -18,16 +18,20 @@ const jwtOptions ={
 }
 
 const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)=>{
-    console.log('reached in local strategy');
+    console.log(Password);
     let user;
     let passowrdMathes;
     try {
         user = await User.findOne({Email});
+        if(!user) console.log('no user!');
         if(!user) return done(null, false)
+        console.log(Password)
         passowrdMathes = await user.comparePasswords(Password);
+        if(!passowrdMathes) console.log('no password match!');
         if(!passowrdMathes) return done(null, false)
         return done(null, true);
     } catch (error) {
+        console.log('oops');
         console.log(error.message);
     }
 })
@@ -48,14 +52,8 @@ const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
 
 
 
-
-
 passport.use(LocalLogin);
 passport.use(jwtAuthentication)
-// passport.use(new GoogleStrategy(
-    
-// ))
-
 
 export const requireLogin = passport.authenticate('local', {session: false}) 
 export const requireAuthentication = passport.authenticate('jwt', {session: false});

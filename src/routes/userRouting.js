@@ -7,13 +7,15 @@ import  Product  from "../models/product";
 import dotenv from 'dotenv'
 import * as productFunction from '../conrollers/proudctControllers'
 import { Cart } from "../models/cart";
-import produce from 'immer'
-import {middlewareexample} from '../services/amazon'
 import Search from '../conrollers/proudctControllers'
 import {stripeFunction} from '../services/payment'
 import Stripe from "stripe";
-import { BSON } from "mongodb";
 import {generate} from '../services/gpt'
+import Transaction from "../models/Transaction";
+import {paymentStatus} from '../models/Transaction'
+
+dotenv.config({silent:true});
+const STRIPE_URL = 'https://api.stripe.com/v1'
 
 const ourPercentage = .24;
 dotenv.config({silent : true})
@@ -24,13 +26,14 @@ router.get('/', async (req, res)=>{
 })
 router.post('/signup', async (req, res)=>{
     const userInfo = req.body;
-    const userId = new Date.now()
+    const userId = Date.now()
     const Fields = userInfo.userInfo;
     try {
         const userEmail = Fields.Email;
+        // make verifications
        const Token =  await singupUser(Fields);
        const userInfoForFrontEnd = {firstName : Fields.firstName, lastName : Fields.lastName, userEmail: Fields.Email, phoneNumber : Fields.phoneNumber}
-       console.log(Token);
+       console.log(userInfoForFrontEnd);
        res.json({UserToken : Token, authKey : process.env.AUTH_KEY, userInfo : userInfoForFrontEnd});
     } catch (error) {
         console.log(error.message);
@@ -74,7 +77,8 @@ router.post('/createProduct', requireAuthentication, async (req, res)=>{
     newProduct.Owner = id;
     const Fields = req.body;
     const pricingInfo = await productFunction.createProductAndPrice(Fields.productName, Fields.productPrice, 'usd')
-    newProduct[productPricingInformation] = pricingInfo;
+    newProduct[priceId] = pricingInfo.priceId;
+    newProduct[productId] = pricingInfo.productId;
     Object.keys(Fields).forEach(key=>{
         newProduct[key] = Fields[key]
     })
@@ -104,12 +108,29 @@ router.get('/category', async(req, res)=>{
     res.send({products})
 })
 
-router.post('/generate', generate)
+router.post('/generate', generate);
 
-router.post('/webhook', async(req, res)=>{
+router.post('/confirm-receipt', requireAuthentication, (req, res)=>{
+    const transaction = Transaction.findById(req.transactionId);
+    transaction.paymentStatus = paymentStatus.PAID_AND_RECIEVED;
+    const sellerid = transaction.Seller;
+    // send the money to the user's account
+    const stripeaccountid = User.findById(sellerid).stripeaccountid;
+    const paymentLink = stripe.paymentLink.create({
+        account :  stripeaccountid,
+        return_url : 'http://localhost:5173/',
+        reauthenticate_url : 'http://localhost:5173/authenticate',
+        type : 'account_onboarding'
+    })
+
+    res.json({paymentLink})
+})
+
+router.post('/webhook', requireAuthentication, async(req, res)=>{
     console.log('reach out here in webhooks');
     const event =  req.body.type;
     switch(event){
+        // other cases are not done
         case 'payment_intent.succeeded':
             console.log('payment intent became successful here');
             const payment_method_options = req.body.data;
@@ -120,9 +141,25 @@ router.post('/webhook', async(req, res)=>{
             break;
         case 'checkout.session.completed':
             const checkoutId = req.body.data.object.id;
-            const session = await stripe.checkout.sessions.retrieve(checkoutId, {expand : ['customer']});
-            console.log(session);
-            break;
+            stripe.checkout.sessions.listLineItems(checkoutId, (error, lineItems)=>{
+                if(lineItems){
+                    lineItems.data.map(line_item=>{
+                        // find the product whose paymet information matches this, and then the associated owner, and then craete a pending transaction between that person and the owner, and the amout she should recieve
+                        const Seller =  Product.find({priceId : line_item.price}).then(product=>{
+                            const seller = product.Seller;
+                            const newTransaction  = new Transaction();
+                            newTransaction[product] = product._id;
+                            newTransaction[TransactionType] = product.Purpose,
+                            newTransaction[Buyer] = req.user,
+                            newTransaction[Seller] = seller,
+                            newTransaction[TransactionAmout] = line_item.amount_total,
+                            newTransaction[TransactionTime] = Date.now();
+                            newTransaction[amount_seller] = (1-ourPercentage) * lineItems.amount_total;
+                            newTransaction.save();
+                        })
+                    })
+                }
+            })
         default:
             return null;
     }
