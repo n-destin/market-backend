@@ -1,10 +1,9 @@
 import mongoose, {model, Schema} from "mongoose";
 
 const conversationSchema = new Schema({
-    conversationName : String,
-    // belongsToItem: 
-    // user1id:Schema.Types.ObjectId, //indexed field
-    // user2id:Schema.Types.ObjectId, //indexed field
+    belongsToItem: Schema.Types.ObjectId,
+    user1id:Schema.Types.ObjectId, 
+    user2id:Schema.Types.ObjectId, 
     messages : [Schema.Types.ObjectId]
 })
 

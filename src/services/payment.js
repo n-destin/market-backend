@@ -14,9 +14,9 @@ export async function stripeFunction(req, res){
     const priceObjectIdsAndQuantityArray =  (checkoutProductIds).map(productInfo=>{
         product = Product.findById(productInfo.productId);
         const priceId =  product.priceId; // product quantity always one
-        return {price : priceId, quantity : 1};
+        return {price : testApiPriceid, quantity : 1};
     })
-    const session = await stripe.paymentlink.sessions.create({
+    const session = await stripe.checkout.sessions.create({
         success_url : 'http://localhost:5173/',
         cancel_url :  'http://localhost:5173/sucsess', 
         payment_method_types : ['card'],

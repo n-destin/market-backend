@@ -3,6 +3,7 @@ import Product from "../models/product";
 import User from "../models/user";
 import { produce } from "immer";
 import Stripe from "stripe";
+import axios from "axios";
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -44,20 +45,29 @@ export async function Search(searchTerm){
     return matchProducts
 }
 //removing from cart 
-export async function createProductAndPrice(name, price, currency){
+export async function createProductAndPrice(name, price, currency) {
+    console.log(name);
     try {
-         stripe.products.create(name).then(response=>{
-            if(response){
-                stripe.prices.create({
-                    product : response.data.id,
-                    unit_amounts : price,
-                    currency,
-                }).then(response=>{
-                    if(response) return {productId : response.data.product, priceId : response.data.id};
-                })
+        const productResponse = await stripe.products.create({ name });
+        console.log('created a product');
+        
+        if (productResponse) {
+            console.log('reached in creating price');
+            const priceResponse = await stripe.prices.create({
+                product: productResponse.id,
+                unit_amount: price,
+                currency,
+            });
+
+            if (priceResponse) {
+                return { productId: priceResponse.product, priceId: priceResponse.id };
             }
-        })
+        }
     } catch (error) {
+        console.log('reached in this error block');
         console.log(error.message);
+        throw error; // Re-throw the error to handle it outside this function if needed.
     }
 }
+
+

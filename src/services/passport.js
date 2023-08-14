@@ -6,19 +6,21 @@ import dotenv from 'dotenv'
 import GoogleStrategy from 'passport-google-oauth2'
 dotenv.config({silent: true})
 
-// const AUTH_KEY = process.env.AUTH_KEY
 
 const localOptions = {usernameField: 'Email', passwordField: 'Password'};
-const AUTH_KEY = 'niyomufashadestintuyizerehonore'
-
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
-    secretOrKey : AUTH_KEY 
+    secretOrKey : process.env.AUTH_KEY
+}
+
+export const middlewareTest =(req)=>{
+    console.log('reached in the testing miffleware');
+    console.log(jwtOptions.jwtFromRequest(req));
+    return (null, true);
 }
 
 const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)=>{
-    console.log(Password);
     let user;
     let passowrdMathes;
     try {
@@ -37,11 +39,10 @@ const LocalLogin = new LocalStrategy(localOptions, async (Email, Password, done)
 })
 
 const jwtAuthentication = new JwtStrategy(jwtOptions, async (payload, done)=>{
-    console.log('reached in authorization');
+    console.log('reached in jwt strategy');
     let user;
     try {
         user = await User.findById(payload.sub);
-        console.log(user);
         if(!user) return done(null, false);
         return done(null, user)
     } catch (error) {
@@ -56,4 +57,4 @@ passport.use(LocalLogin);
 passport.use(jwtAuthentication)
 
 export const requireLogin = passport.authenticate('local', {session: false}) 
-export const requireAuthentication = passport.authenticate('jwt', {session: false});
+export const requireAuthorization = passport.authenticate('jwt', {session: false});

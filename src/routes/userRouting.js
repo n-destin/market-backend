@@ -1,7 +1,7 @@
 import User from "../models/user";
 import { Router } from "express";
 import { signIn, singupUser } from "../conrollers/userControllers";
-import {requireAuthentication, requireLogin} from '../services/passport'
+import {requireAuthorization, requireLogin, middlewareTest} from '../services/passport'
 import getS3Url from '../services/amazon'
 import  Product  from "../models/product";
 import dotenv from 'dotenv'
@@ -13,6 +13,7 @@ import Stripe from "stripe";
 import {generate} from '../services/gpt'
 import Transaction from "../models/Transaction";
 import {paymentStatus} from '../models/Transaction'
+import { Conversation } from "../models/conversation";
 
 dotenv.config({silent:true});
 const STRIPE_URL = 'https://api.stripe.com/v1'
@@ -34,6 +35,7 @@ router.post('/signup', async (req, res)=>{
        const Token =  await singupUser(Fields);
        const userInfoForFrontEnd = {firstName : Fields.firstName, lastName : Fields.lastName, userEmail: Fields.Email, phoneNumber : Fields.phoneNumber}
        console.log(userInfoForFrontEnd);
+       console.log('reached here');
        res.json({UserToken : Token, authKey : process.env.AUTH_KEY, userInfo : userInfoForFrontEnd});
     } catch (error) {
         console.log(error.message);
@@ -42,10 +44,10 @@ router.post('/signup', async (req, res)=>{
 
 
 router.post('/signin', requireLogin, async (req, res)=>{
-    console.log('reached in the login');
-    const Token = signIn(req.body);
-    res.json({UserToken: Token});
+    const returnedFromSignin = await signIn(req.body);
+    res.json({UserToken: returnedFromSignin.Token, userInfo : returnedFromSignin.user});
 })
+
 router.post('/posting', async (req, res)=>{
     res.json({message : 'this is a response'})
 })
@@ -70,15 +72,19 @@ router.get('/getProduct/:id', async (req, res)=>{
 })
 
  // wrap everything into try and catch //
-router.post('/createProduct', requireAuthentication, async (req, res)=>{
-    console.log('reached in the backend creating');
+router.post('/createProduct', requireAuthorization, async (req, res)=>{
+    console.log('creating the product');
     const newProduct = new Product;
-    const id = req.user.id;
+    const id = req.user;
+    // make sure the product doesn't already exist .. we can limit the rate at which people post their products
     newProduct.Owner = id;
     const Fields = req.body;
-    const pricingInfo = await productFunction.createProductAndPrice(Fields.productName, Fields.productPrice, 'usd')
-    newProduct[priceId] = pricingInfo.priceId;
-    newProduct[productId] = pricingInfo.productId;
+    console.log(Fields);
+    // the amount is missing ... I don't know why
+    const pricingInfo = await productFunction.createProductAndPrice(Fields.Name, Fields.productPrice, 'usd')
+    console.log(pricingInfo);
+    newProduct.priceId = pricingInfo.priceId;
+    newProduct.productId = pricingInfo.productId;
     Object.keys(Fields).forEach(key=>{
         newProduct[key] = Fields[key]
     })
@@ -87,16 +93,27 @@ router.post('/createProduct', requireAuthentication, async (req, res)=>{
 
 })
 
-router.post('/addtocart', requireAuthentication, async (req, res)=>{
-    console.log('adding to card');
+
+router.post('/addtocart', requireAuthorization, async (req, res)=>{
     const userId = req.user;
-    const cart = Cart.findOne({Owner: userId})
-    if(!cart) throw new Error('there is such cart')
-    await cart.Products.unshift()
+    console.log('reached in the routing');
+    let cart;
+    const productId =  req.query.productId;
+    // there is no product sent
+    let potentialCart = await Cart.findOne({Owner: userId});
+    if(!potentialCart) cart = new Cart(); else cart = potentialCart;
+    if(cart.Products.map(product=>{
+        if(product ===  productId) throw new Error('product already in cart');
+    }))
+    cart.Owner = userId; // fine 
+    cart.Products.push(productId);
+    
+    await cart.save()
+    res.status(200).send({message : 'cart updated'})
 })
 
 router.get(`/search`, async (req, res)=>{
-    const searchTerm = req.searcnh_term;
+    const searchTerm = req.search_term;
     const matchedProrducts = Search(searchTerm);
     res.json({matchedProrducts}) // send them to the client
 })
@@ -111,11 +128,10 @@ router.get('/category', async(req, res)=>{
 
 router.post('/generate', generate);
 
-router.post('/confirm-receipt', requireAuthentication, (req, res)=>{
+router.post('/confirm-receipt', requireAuthorization, (req, res)=>{
     const transaction = Transaction.findById(req.transactionId);
     transaction.paymentStatus = paymentStatus.PAID_AND_RECIEVED;
     const sellerid = transaction.Seller;
-    // send the money to the user's account
     const stripeaccountid = User.findById(sellerid).stripeaccountid;
     const paymentLink = stripe.paymentLink.create({
         account :  stripeaccountid,
@@ -127,11 +143,10 @@ router.post('/confirm-receipt', requireAuthentication, (req, res)=>{
     res.json({paymentLink})
 })
 
-router.post('/webhook', requireAuthentication, async(req, res)=>{
+router.post('/webhook', requireAuthorization, async(req, res)=>{
     console.log('reach out here in webhooks');
     const event =  req.body.type;
     switch(event){
-        // other cases are not done
         case 'payment_intent.succeeded':
             console.log('payment intent became successful here');
             const payment_method_options = req.body.data;
@@ -166,8 +181,60 @@ router.post('/webhook', requireAuthentication, async(req, res)=>{
     }
 })
 
+const getProducts = async (productIds)=>{
+    let products = [];
+    for(let i =0; i<productIds.length; i++){
+        const id = productIds[i].toString();
+        products[i] = await Product.findById(id);
+    }
+
+    return products;
+}
+
+router.get('/getCartElements', requireAuthorization, async(req, res)=>{
+    const user = req.user;
+    console.log(user);
+    const cart = await Cart.findOne({Owner: user.id});
+    const products = await getProducts(cart.Products);
+    console.log(products);
+    res.status(200).json(products);
+})
+
+router.get('/deletecartelement', requireAuthorization, async (req, res)=>{
+    console.log('reached in deletecartelement');
+    const userId = req.user.id;
+    const productId = req.query.productId;
+    console.log(productId);
+    const cart = await Cart.findOne({Owner : userId});
+    for(let  i = 0; i<cart.Products.length; i++){
+        if(cart.Products[i] == productId){
+            console.log('going to delete');
+            cart.Products.splice(i,1);
+        }
+    }
+    await cart.save()
+    res.status(200).json({message: "cart updated"})
+})
 
 router.post('/create-payment-session', stripeFunction);
+
+router.post('/createconversation', requireAuthorization, async(req, res)=>{
+    console.log('going to get a conversation');
+    const userId = req.user.id;
+    const productId = req.query.productId;
+    console.log(productId);
+    const product = await Product.findById(productId);
+    console.log(product);
+    const user2 = product.Seller;
+    console.log(user2);
+    const conversation = new Conversation();
+    conversation.user1id = userId,
+    conversation.user2id = user2;
+    conversation.belongsToItem = productId;
+
+    await conversation.save()
+    res.status(200).json({message: 'coversation created'})
+})
 
 router.get('/sign-s3', getS3Url)
 export default router; 
