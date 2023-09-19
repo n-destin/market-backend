@@ -8,7 +8,8 @@ const openai =  new OpenAIApi(configuration);
 export async function generate(req, res){
     const message = req.body.message;
     // check message and API key
-    if(configuration.apiKey == null || message.trim().length == 0){
+    console.log(message);
+    if(configuration.apiKey == null){
         res.status(400).json(
             {error : {
                 message: 'Check if you entered a correct message'
@@ -24,6 +25,8 @@ export async function generate(req, res){
             prompt : generatePrompt(message),
             temperature : .7
         })
+        console.log(completion);
+        console.log('reached here');
         res.status(200).json({processedMessage : completion.data.choices[0].text})
     } catch (error) {
         res.status(500).json({message : error.message})

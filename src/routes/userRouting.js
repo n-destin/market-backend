@@ -225,16 +225,21 @@ router.post('/createconversation', requireAuthorization, async(req, res)=>{
     console.log(productId);
     const product = await Product.findById(productId);
     console.log(product);
-    const user2 = product.Seller;
-    console.log(user2);
+    const user2Id = product.Seller;
     const conversation = new Conversation();
     conversation.user1id = userId,
-    conversation.user2id = user2;
+    conversation.user2id = user2Id;
     conversation.belongsToItem = productId;
-
+    console.log(conversation);
+    const user1 = await User.findById(conversation.user1id);
+    const user2 = await User.findById(conversation.user2id);
+    (user1) ? user1.userConversations = [...user1.userConversations, conversation._id] : '';
+    (user2) ? user2.userConversations = [...user2.userConversations, conversation._id] : '';
+   
     await conversation.save()
-    res.status(200).json({message: 'coversation created'})
+
+    res.status(200).json({message: conversation._id})
 })
 
 router.get('/sign-s3', getS3Url)
-export default router; 
+export default router;

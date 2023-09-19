@@ -9,6 +9,7 @@ import socketio from 'socket.io'
 import dotenv from 'dotenv'
 import passport from "passport";
 import {getConversations} from './services/chat'
+import { Conversation } from './models/conversation';
 
 // initialize
 const app = express();
@@ -65,6 +66,7 @@ io.on('connection', (socket)=>{
   })
 
   socket.on('new_message', (newMessage, currentRoom)=>{
+    console.log(currentRoom + "  here ");
     socket.to(currentRoom).emit('recieve_message', newMessage);
     const conversation = Conversation.findById(currentRoom);
     conversation.messages = [...conversation.messages, newMessage]; // add the message to the messages of the conversation of the user
@@ -72,6 +74,7 @@ io.on('connection', (socket)=>{
 
   socket.on('get_messages', (conversationId, callBack)=>{
     const messages = Conversation.findById(conversationId); // getting the messages
+    console.log(messages);
     callBack(messages);
   })
 })
@@ -93,6 +96,7 @@ async function startServer() {
     console.error(error);
   }
 }
+
 
 
 startServer();
